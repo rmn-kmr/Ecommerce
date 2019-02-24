@@ -4,6 +4,8 @@ const db = require('./config/database');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
+const UserController = require('./controller/User');
+var salt = bcrypt.genSaltSync();
 
 const storage = multer.diskStorage({
   destination: function(req,file,cb) {
@@ -23,35 +25,7 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-    app.post('/user/signup', (req, res)=>{
-
-   const email = req.body.email;
-   const password = req.body.password;
-
-   //Encryption
-       var salt = bcrypt.genSaltSync();
-
-       var encryptedPassword = bcrypt.hashSync(password, salt);
-
-       //Decrypt
-       var orgPassword = bcrypt.compareSync(password, encryptedPassword);
-
-   var insertQuery = `insert into users (email, password) values ('${email}', '${encryptedPassword}')`;
-   const resultData = {};
-   db.execute(insertQuery, (err, result)=>{
-     if (err) {
-       resultData.status = 0;
-       resultData.message = "something went wrong";
-     }else {
-         resultData.status = 1;
-         resultData.message = "Successfully signup";
-     }
-
-     res.send({
-       data : resultData
-     });
-   })
-});
+  app.post('/user/signup', UserController.signup);
 
 app.post('/product/add',upload.single('productImage'),(req,res) => {
   const name =req.body.name;
@@ -118,15 +92,7 @@ app.post('/productfav',(req,res)=> {
 
 });
 
-app.post('/user/login',(req,res) =>{
-   var query = `select * from users where email = '${req.body.email}' and password ='${req.body.password}'`;
-   console.log(query);
-  db.execute(query,(err,result) =>{
-    if(err) throw(err);
-    res.send(result);
-  });
-
-});
+app.post('/user/login', UserController.login);
 
 app.post('/products',(req, res)=>{
   var data = req.body;
