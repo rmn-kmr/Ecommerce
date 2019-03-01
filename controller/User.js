@@ -4,7 +4,7 @@ let UserController = {};
 
 UserController.login = (req, res) => {
 
-  let resData= {};
+
 
   let data = req.body;
   const email = data.email;
@@ -28,6 +28,7 @@ UserController.signup = (req,res) => {
   const email =data.email;
   const password = data.password;
   console.log("--------------------------------------");
+
     if(email != undefined && email.trim() != '' && password != undefined && password.trim() != '' ) {
       UserModel.signup(data,(err,result)=> {
         res.send(result);
